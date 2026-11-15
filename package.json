@@ -1,0 +1,25 @@
+{
+  "name": "lms-ai-platform",
+  "version": "1.0.0",
+  "description": "Learning Management System with AI Tutor (LMS-AI) - Vertexon Learning Technologies",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend run build",
+    "test": "npm --prefix backend test"
+  },
+  "keywords": [
+    "lms",
+    "ai-tutor",
+    "rag",
+    "edtech"
+  ],
+  "author": "Vertexon Learning Technologies Pvt. Ltd.",
+  "license": "UNLICENSED"
+}
