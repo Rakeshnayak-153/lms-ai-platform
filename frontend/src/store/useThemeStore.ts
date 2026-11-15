@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type ThemeMode = 'minimal-light' | 'dark-ai' | 'emerald-navy';
+export type ThemeMode = 'emerald-navy' | 'dark-ai' | 'minimal-light';
 
 interface ThemeState {
   theme: ThemeMode;
@@ -8,7 +8,7 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>((set) => ({
-  theme: (localStorage.getItem('lms_theme') as ThemeMode) || 'minimal-light',
+  theme: (localStorage.getItem('lms_theme') as ThemeMode) || 'emerald-navy',
   setTheme: (theme) => {
     localStorage.setItem('lms_theme', theme);
     set({ theme });

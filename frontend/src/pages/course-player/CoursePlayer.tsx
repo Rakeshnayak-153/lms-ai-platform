@@ -162,14 +162,12 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
         watchedSeconds: 600,
         completed: true,
       });
-    } catch (err) {
-      // Local fallback
-    }
+    } catch (err) {}
 
     setCertificateData({
       studentName: 'Ananya Sharma',
       courseTitle: course?.title || 'Advanced Masterclass',
-      certificateNumber: 'VRTX-DSA-2026-CERT',
+      certificateNumber: 'VRTX-EMERALD-2026-CERT',
       issuedDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
     });
     setShowCertModal(true);
@@ -190,9 +188,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
         timestampSeconds: currentTime || 120,
         content: noteContent,
       });
-    } catch (err) {
-      // Saved locally
-    }
+    } catch (err) {}
   };
 
   const handleSendMessage = async (customText?: string) => {
@@ -267,40 +263,40 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
   const isEmbedVideo = activeLecture?.videoUrl?.includes('youtube') || activeLecture?.videoUrl?.includes('embed');
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col font-sans">
+    <div className="min-h-screen bg-[#040814] text-slate-100 flex flex-col font-sans">
       {/* Top Header */}
-      <div className="bg-slate-950 border-b border-slate-800 px-6 py-3 flex items-center justify-between">
+      <div className="bg-[#060e20] border-b border-emerald-950/80 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
             onClick={onBack}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition"
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-[#0a152e] hover:bg-[#0f2044] text-xs font-semibold text-emerald-400 border border-emerald-950/80 transition"
           >
             <ChevronLeft className="w-4 h-4" />
             <span>Catalog</span>
           </button>
           <div>
-            <h1 className="text-sm sm:text-base font-bold text-slate-100 line-clamp-1">{course?.title}</h1>
-            <p className="text-xs text-slate-400">Current Lecture: {activeLecture?.title}</p>
+            <h1 className="text-sm sm:text-base font-bold text-white line-clamp-1">{course?.title}</h1>
+            <p className="text-xs text-emerald-400 font-medium">Lecture: {activeLecture?.title}</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsAiOpen(!isAiOpen)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
               isAiOpen
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20'
+                : 'bg-[#0a152e] text-slate-300 hover:bg-[#0f2044] border border-emerald-950/80'
             }`}
           >
-            <Bot className="w-4 h-4 text-amber-300" />
+            <Bot className="w-4 h-4 text-emerald-200" />
             <span>AI Tutor</span>
           </button>
 
           {certificateData && (
             <button
               onClick={() => setShowCertModal(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-slate-950 hover:bg-amber-400 transition"
+              className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 transition"
             >
               <Award className="w-4 h-4" />
               <span>Certificate</span>
@@ -312,9 +308,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
       {/* Main Player + Sidebar Layout */}
       <div className="flex-grow flex flex-col lg:flex-row overflow-hidden">
         {/* Left / Center: Video and Tabs */}
-        <div className="flex-1 flex flex-col overflow-y-auto bg-slate-900 p-4 sm:p-6">
+        <div className="flex-1 flex flex-col overflow-y-auto bg-[#040814] p-4 sm:p-6">
           {/* Responsive Video Player Box */}
-          <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 mb-6">
+          <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-emerald-950/80 mb-6">
             {isEmbedVideo ? (
               <iframe
                 src={`${activeLecture.videoUrl}?autoplay=0&rel=0&modestbranding=1`}
@@ -336,20 +332,20 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </div>
 
           {/* Quick Action Bar under video */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#071024] p-4 rounded-2xl border border-emerald-950/80 mb-6">
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-slate-200">{activeLecture?.title}</span>
-              <span className="text-[11px] font-mono text-slate-500">
+              <span className="text-xs font-bold text-white">{activeLecture?.title}</span>
+              <span className="text-[11px] font-mono text-emerald-400">
                 ({formatSeconds(activeLecture?.durationSeconds || 720)})
               </span>
             </div>
 
             <button
               onClick={handleMarkComplete}
-              className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition ${
+              className={`flex items-center space-x-1.5 px-5 py-2 rounded-xl text-xs font-bold shadow-md transition ${
                 completedLectures.includes(activeLecture?.id)
                   ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                  : 'bg-blue-600 hover:bg-blue-500 text-white'
+                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
               }`}
             >
               <CheckCircle className="w-4 h-4" />
@@ -358,23 +354,23 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </div>
 
           {/* Player Tabs */}
-          <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 flex-grow">
-            <div className="flex space-x-4 border-b border-slate-800 pb-3 mb-4 text-xs font-semibold">
+          <div className="bg-[#071024] border border-emerald-950/80 rounded-3xl p-6 flex-grow">
+            <div className="flex space-x-5 border-b border-emerald-950/80 pb-3 mb-4 text-xs font-bold">
               <button
                 onClick={() => setActiveTab('transcript')}
-                className={`pb-1 transition ${activeTab === 'transcript' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-slate-400 hover:text-slate-200'}`}
+                className={`pb-1 transition ${activeTab === 'transcript' ? 'text-emerald-400 border-b-2 border-emerald-500' : 'text-slate-400 hover:text-white'}`}
               >
                 Transcript
               </button>
               <button
                 onClick={() => setActiveTab('notes')}
-                className={`pb-1 transition ${activeTab === 'notes' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-slate-400 hover:text-slate-200'}`}
+                className={`pb-1 transition ${activeTab === 'notes' ? 'text-emerald-400 border-b-2 border-emerald-500' : 'text-slate-400 hover:text-white'}`}
               >
                 Timestamped Notes ({notes.length})
               </button>
               <button
                 onClick={() => setActiveTab('quiz')}
-                className={`pb-1 transition ${activeTab === 'quiz' ? 'text-blue-400 border-b-2 border-blue-500' : 'text-slate-400 hover:text-slate-200'}`}
+                className={`pb-1 transition ${activeTab === 'quiz' ? 'text-emerald-400 border-b-2 border-emerald-500' : 'text-slate-400 hover:text-white'}`}
               >
                 Module Assessment
               </button>
@@ -384,16 +380,16 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
             {activeTab === 'transcript' && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-slate-400">Full lecture spoken transcript for RAG analysis:</span>
+                  <span className="text-xs text-slate-400">Lecture spoken transcript for RAG vector search:</span>
                   <button
                     onClick={handleSummarize}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg text-xs font-medium border border-blue-500/30 transition"
+                    className="flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-950/60 text-emerald-400 hover:bg-emerald-900/40 rounded-xl text-xs font-bold border border-emerald-800/40 transition"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Auto-Summarize Key Points</span>
                   </button>
                 </div>
-                <p className="text-sm text-slate-300 leading-relaxed bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 font-serif">
+                <p className="text-sm text-slate-200 leading-relaxed bg-[#050a18] p-5 rounded-2xl border border-emerald-950/80 font-serif">
                   {activeLecture?.transcript || 'No transcript available for this lecture.'}
                 </p>
               </div>
@@ -408,11 +404,11 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                     value={noteContent}
                     onChange={(e) => setNoteContent(e.target.value)}
                     placeholder="Take a timestamped lecture note..."
-                    className="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="flex-grow bg-[#050a18] border border-emerald-950/80 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   />
                   <button
                     onClick={handleSaveNote}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-semibold transition"
+                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow transition"
                   >
                     Save Note
                   </button>
@@ -423,9 +419,9 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                     <p className="text-xs text-slate-500 italic">No notes created yet. Type above to bookmark a concept with its timestamp.</p>
                   ) : (
                     notes.map((n) => (
-                      <div key={n.id} className="p-3 bg-slate-900 border border-slate-800/80 rounded-xl flex items-center justify-between">
+                      <div key={n.id} className="p-3 bg-[#050a18] border border-emerald-950/80 rounded-xl flex items-center justify-between">
                         <span className="text-sm text-slate-200">{n.content}</span>
-                        <span className="text-xs font-mono px-2 py-0.5 bg-slate-800 text-blue-400 rounded-md">
+                        <span className="text-xs font-mono px-2 py-0.5 bg-[#0a152e] text-emerald-400 rounded-md border border-emerald-900/50">
                           {formatSeconds(n.timestampSeconds)}
                         </span>
                       </div>
@@ -440,14 +436,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
               <div className="space-y-3">
                 <p className="text-xs text-slate-400 mb-2">Complete this quiz to test your mastery and unlock the completion certificate.</p>
                 {course.modules?.[0]?.quizzes?.map((q: any) => (
-                  <div key={q.id} className="p-4 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                  <div key={q.id} className="p-5 bg-[#050a18] border border-emerald-950/80 rounded-2xl flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-bold text-white">{q.title}</h4>
-                      <p className="text-xs text-slate-400 mt-1">{q.questions?.length || 3} Questions • Objective Auto-Graded</p>
+                      <p className="text-xs text-emerald-400 mt-1">{q.questions?.length || 3} Questions • Objective Auto-Graded</p>
                     </div>
                     <button
                       onClick={() => setActiveQuizId(q.id)}
-                      className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold shadow-md transition"
+                      className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition"
                     >
                       Start Quiz
                     </button>
@@ -458,20 +454,20 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </div>
         </div>
 
-        {/* Right Sidebar: AI Tutor Drawer & Syllabus Switcher */}
-        <div className="w-full lg:w-96 bg-slate-950 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-[550px] lg:h-auto">
+        {/* Right Sidebar: AI Tutor Drawer */}
+        <div className="w-full lg:w-96 bg-[#060e20] border-t lg:border-t-0 lg:border-l border-emerald-950/80 flex flex-col h-[550px] lg:h-auto">
           {/* Lecture Switcher Header */}
-          <div className="p-3 bg-slate-900 border-b border-slate-800">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Switch Lecture:</span>
+          <div className="p-3 bg-[#081226] border-b border-emerald-950/80">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-2">Switch Lecture:</span>
             <div className="flex gap-2">
               {course.modules?.[0]?.lectures?.map((lec: any, idx: number) => (
                 <button
                   key={lec.id}
                   onClick={() => handleLectureChange(lec)}
-                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${
+                  className={`flex-1 py-1.5 px-2 rounded-xl text-xs font-bold transition ${
                     activeLecture?.id === lec.id
-                      ? 'bg-blue-600 text-white shadow'
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-emerald-600 text-white shadow'
+                      : 'bg-[#0a152e] text-slate-300 hover:bg-[#0f2044] border border-emerald-950/60'
                   }`}
                 >
                   Lecture 0{idx + 1}
@@ -483,13 +479,13 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           {/* AI Tutor Chat Drawer */}
           <div className="flex-1 flex flex-col h-full">
             {/* AI Drawer Header */}
-            <div className="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+            <div className="p-3.5 border-b border-emerald-950/80 flex items-center justify-between bg-[#081226]">
               <div className="flex items-center space-x-2">
-                <Bot className="w-5 h-5 text-blue-400" />
+                <Bot className="w-5 h-5 text-emerald-400" />
                 <div>
                   <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
                     Course AI Tutor
-                    <span className="px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded text-[10px]">RAG</span>
+                    <span className="px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded text-[10px] font-bold">RAG</span>
                   </h3>
                   <p className="text-[10px] text-slate-400">Grounded in lecture material</p>
                 </div>
@@ -499,7 +495,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
               <select
                 value={aiMode}
                 onChange={(e) => setAiMode(e.target.value as any)}
-                className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] rounded-lg px-2 py-1 focus:outline-none"
+                className="bg-[#050a18] border border-emerald-950/80 text-emerald-300 text-[11px] font-semibold rounded-xl px-2 py-1 focus:outline-none"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -517,22 +513,22 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                   <div
                     className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
                       msg.sender === 'user'
-                        ? 'bg-blue-600 text-white rounded-br-none'
-                        : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'
+                        ? 'bg-emerald-600 text-white rounded-br-none'
+                        : 'bg-[#081226] text-slate-200 border border-emerald-950/80 rounded-bl-none'
                     }`}
                   >
                     <p className="whitespace-pre-line">{msg.content}</p>
 
                     {/* Source Citation Pills */}
                     {msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-2.5 pt-2 border-t border-slate-800/80">
-                        <span className="text-[10px] font-semibold text-amber-400 block mb-1">
+                      <div className="mt-2.5 pt-2 border-t border-emerald-950/80">
+                        <span className="text-[10px] font-bold text-emerald-400 block mb-1">
                           Grounding Citation:
                         </span>
                         {msg.sources.map((s: any, idx: number) => (
                           <span
                             key={idx}
-                            className="inline-block text-[10px] bg-slate-800 text-blue-300 px-2 py-0.5 rounded border border-slate-700 mr-1"
+                            className="inline-block text-[10px] bg-[#050a18] text-emerald-300 px-2 py-0.5 rounded-lg border border-emerald-900/60 mr-1"
                           >
                             📍 {s.lectureTitle} @ {formatSeconds(s.timestampSeconds)}
                           </span>
@@ -543,31 +539,31 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                 </div>
               ))}
               {isAiTyping && (
-                <div className="text-xs text-slate-400 italic flex items-center gap-1.5 p-2">
-                  <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                <div className="text-xs text-emerald-400 italic flex items-center gap-1.5 p-2 font-medium">
+                  <Sparkles className="w-3.5 h-3.5 animate-spin text-emerald-400" />
                   AI Tutor is retrieving lecture context...
                 </div>
               )}
             </div>
 
             {/* Quick Prompt Pills */}
-            <div className="px-3 py-1.5 border-t border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px]">
+            <div className="px-3 py-1.5 border-t border-emerald-950/80 flex gap-1.5 overflow-x-auto text-[11px]">
               <button
                 onClick={() => handleSendMessage('Why does quicksort degrade to O(n^2)?')}
-                className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
+                className="px-2.5 py-1 bg-[#081226] hover:bg-[#0a152e] text-emerald-300 rounded-lg border border-emerald-950/80 whitespace-nowrap font-medium"
               >
                 ⚡ Quicksort O(n²)
               </button>
               <button
                 onClick={() => handleSendMessage('Explain BST In-Order Traversal')}
-                className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
+                className="px-2.5 py-1 bg-[#081226] hover:bg-[#0a152e] text-emerald-300 rounded-lg border border-emerald-950/80 whitespace-nowrap font-medium"
               >
                 🌲 BST Traversal
               </button>
             </div>
 
             {/* Chat Input Box */}
-            <div className="p-3 border-t border-slate-800 bg-slate-900/60">
+            <div className="p-3 border-t border-emerald-950/80 bg-[#081226]">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -580,11 +576,11 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Ask about this lecture..."
-                  className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="flex-grow bg-[#050a18] border border-emerald-950/80 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                 />
                 <button
                   type="submit"
-                  className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow transition"
+                  className="p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow transition"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -608,27 +604,27 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
       {/* Certificate Modal */}
       {showCertModal && certificateData && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white text-slate-900 rounded-3xl p-8 max-w-lg w-full shadow-2xl border-4 border-amber-400 text-center relative overflow-hidden">
-            <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-600" />
-            <Award className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Certificate of Mastery</h2>
-            <p className="text-xs text-slate-500 uppercase tracking-widest mt-1">Vertexon Learning Technologies</p>
+          <div className="bg-[#060e20] text-white rounded-3xl p-8 max-w-lg w-full shadow-2xl border-2 border-emerald-500 text-center relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
+            <Award className="w-16 h-16 text-emerald-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-black text-white tracking-tight">Certificate of Mastery</h2>
+            <p className="text-xs text-emerald-400 uppercase tracking-widest mt-1 font-bold">Vertexon Learning Technologies</p>
 
-            <div className="my-6 py-4 border-y border-slate-200">
-              <p className="text-xs text-slate-500">This certifies that</p>
-              <h3 className="text-xl font-bold text-blue-700 my-1">{certificateData.studentName}</h3>
-              <p className="text-xs text-slate-500">has successfully completed all modules of</p>
-              <h4 className="text-base font-bold text-slate-900 mt-1">{certificateData.courseTitle}</h4>
+            <div className="my-6 py-4 border-y border-emerald-950/80 bg-[#081226]/60 rounded-2xl">
+              <p className="text-xs text-slate-400">This certifies that</p>
+              <h3 className="text-xl font-black text-emerald-400 my-1">{certificateData.studentName}</h3>
+              <p className="text-xs text-slate-400">has successfully completed all modules of</p>
+              <h4 className="text-base font-bold text-white mt-1">{certificateData.courseTitle}</h4>
             </div>
 
-            <div className="flex justify-between items-center text-xs text-slate-500 mb-6 font-mono">
+            <div className="flex justify-between items-center text-xs text-slate-400 mb-6 font-mono">
               <span>Cert #: {certificateData.certificateNumber}</span>
               <span>Issued: {certificateData.issuedDate}</span>
             </div>
 
             <button
               onClick={() => setShowCertModal(false)}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg transition"
             >
               Close & Continue
             </button>
