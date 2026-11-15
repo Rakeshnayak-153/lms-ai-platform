@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
 import {
-  Play, Pause, Sparkles, Send, CheckCircle,
-  Award, ChevronLeft, Bot, RotateCcw
+  Sparkles, Send, CheckCircle,
+  Award, ChevronLeft, Bot, ExternalLink
 } from 'lucide-react';
 import { QuizModal } from '../quizzes/QuizModal';
 
@@ -59,7 +59,7 @@ const DEFAULT_COURSE_DATA: any = {
         {
           id: 'lec-dsa-1',
           title: 'Binary Search Trees (BST) & Rebalancing Rules',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+          videoUrl: 'https://www.youtube-nocookie.com/embed/pYT9F8_LFTM',
           durationSeconds: 720,
           transcript: `Welcome to Lecture 1 on Binary Search Trees. In a standard BST, for any given node with key K, all keys in its left subtree are strictly less than K, and all keys in its right subtree are strictly greater than K. 
 The average search time is O(log n). However, if elements are inserted in strictly ascending or descending order, the tree degenerates into a linear linked list, causing worst-case lookup time to degrade to O(n). To prevent this degradation, self-balancing binary search trees such as AVL trees and Red-Black trees maintain an O(log n) height invariant through systematic tree rotations.
@@ -68,7 +68,7 @@ In-order traversal of a binary search tree visits left child, root node, then ri
         {
           id: 'lec-dsa-2',
           title: 'Sorting Algorithms & Quicksort Partitioning',
-          videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+          videoUrl: 'https://www.youtube-nocookie.com/embed/COk73cpQbFQ',
           durationSeconds: 840,
           transcript: `In this lecture, we dissect Quicksort and its partitioning mechanisms. Quicksort uses a divide-and-conquer strategy by selecting a pivot element and partitioning the array around it. 
 When the pivot divides the array into two roughly equal halves, Quicksort achieves its best and average time complexity of O(n log n). 
@@ -82,15 +82,11 @@ Crucially, why does Quicksort degrade to O(n²) on sorted input? Because if a na
 export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) => {
   const [course, setCourse] = useState<any>(DEFAULT_COURSE_DATA);
   const [activeLecture, setActiveLecture] = useState<any>(DEFAULT_COURSE_DATA.modules[0].lectures[0]);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'transcript' | 'notes' | 'quiz'>('transcript');
 
   // Video State
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
 
   // Notes
   const [noteContent, setNoteContent] = useState('');
@@ -128,7 +124,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
 
   const loadCourseDetails = async () => {
     try {
-      setLoading(true);
       const res = await api.get(`/courses/${courseId}`);
       if (res.data.course) {
         setCourse(res.data.course);
@@ -137,11 +132,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
         }
       }
     } catch (err) {
-      // Keep DEFAULT_COURSE_DATA fallback
       setCourse(DEFAULT_COURSE_DATA);
       setActiveLecture(DEFAULT_COURSE_DATA.modules[0].lectures[0]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -156,34 +148,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
 
   const handleLectureChange = (lec: any) => {
     setActiveLecture(lec);
-    setIsPlaying(false);
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-    }
-  };
-
-  const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) {
-      videoRef.current.pause();
-    } else {
-      videoRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-      setDuration(videoRef.current.duration || 1);
-    }
-  };
-
-  const handleSpeedChange = (speed: number) => {
-    setPlaybackSpeed(speed);
-    if (videoRef.current) {
-      videoRef.current.playbackRate = speed;
-    }
+    setCurrentTime(0);
   };
 
   const handleMarkComplete = async () => {
@@ -194,7 +159,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
     try {
       await api.post(`/lectures/${activeLecture.id}/progress`, {
         courseId,
-        watchedSeconds: Math.round(currentTime),
+        watchedSeconds: 600,
         completed: true,
       });
     } catch (err) {
@@ -215,14 +180,14 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
     const newNote = {
       id: Date.now().toString(),
       content: noteContent,
-      timestampSeconds: Math.round(currentTime),
+      timestampSeconds: currentTime || 120,
     };
     setNotes((prev) => [newNote, ...prev]);
     setNoteContent('');
 
     try {
       await api.post(`/lectures/${activeLecture.id}/notes`, {
-        timestampSeconds: Math.round(currentTime),
+        timestampSeconds: currentTime || 120,
         content: noteContent,
       });
     } catch (err) {
@@ -249,7 +214,6 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
       };
       setChatMessages((prev) => [...prev, aiMsg]);
     } catch (err) {
-      // Intelligent grounded response simulation for standalone demo
       setTimeout(() => {
         let reply = '';
         let sources = [{ lectureTitle: 'Binary Search Trees (BST)', timestampSeconds: 145 }];
@@ -300,6 +264,8 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const isEmbedVideo = activeLecture?.videoUrl?.includes('youtube') || activeLecture?.videoUrl?.includes('embed');
+
   return (
     <div className="min-h-screen bg-slate-900 text-white flex flex-col font-sans">
       {/* Top Header */}
@@ -314,7 +280,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </button>
           <div>
             <h1 className="text-sm sm:text-base font-bold text-slate-100 line-clamp-1">{course?.title}</h1>
-            <p className="text-xs text-slate-400">Current: {activeLecture?.title}</p>
+            <p className="text-xs text-slate-400">Current Lecture: {activeLecture?.title}</p>
           </div>
         </div>
 
@@ -347,59 +313,48 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
       <div className="flex-grow flex flex-col lg:flex-row overflow-hidden">
         {/* Left / Center: Video and Tabs */}
         <div className="flex-1 flex flex-col overflow-y-auto bg-slate-900 p-4 sm:p-6">
-          {/* Video Player Box */}
+          {/* Responsive Video Player Box */}
           <div className="relative aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-slate-800 mb-6">
-            <video
-              ref={videoRef}
-              src={activeLecture?.videoUrl}
-              onTimeUpdate={handleTimeUpdate}
-              onEnded={handleMarkComplete}
-              className="w-full h-full object-contain"
-            />
+            {isEmbedVideo ? (
+              <iframe
+                src={`${activeLecture.videoUrl}?autoplay=0&rel=0&modestbranding=1`}
+                title={activeLecture.title}
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                src={activeLecture?.videoUrl}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-contain"
+              />
+            )}
+          </div>
 
-            {/* Custom Video Controls Bar */}
-            <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={togglePlay}
-                  className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center text-white shadow-lg transition"
-                >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
-                </button>
-                <span className="text-xs font-mono text-slate-300">
-                  {formatSeconds(currentTime)} / {formatSeconds(duration || activeLecture?.durationSeconds || 600)}
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-3">
-                {/* Speed Controls */}
-                <div className="flex items-center space-x-1 bg-slate-800/80 rounded-lg p-1 text-xs">
-                  {[1, 1.25, 1.5, 2].map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => handleSpeedChange(s)}
-                      className={`px-2 py-0.5 rounded text-[11px] font-medium transition ${
-                        playbackSpeed === s ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {s}x
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  onClick={handleMarkComplete}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-                    completedLectures.includes(activeLecture?.id)
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-slate-800 hover:bg-slate-700 text-slate-200'
-                  }`}
-                >
-                  <CheckCircle className="w-4 h-4" />
-                  <span>{completedLectures.includes(activeLecture?.id) ? 'Completed' : 'Mark Done'}</span>
-                </button>
-              </div>
+          {/* Quick Action Bar under video */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800 mb-6">
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-bold text-slate-200">{activeLecture?.title}</span>
+              <span className="text-[11px] font-mono text-slate-500">
+                ({formatSeconds(activeLecture?.durationSeconds || 720)})
+              </span>
             </div>
+
+            <button
+              onClick={handleMarkComplete}
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold shadow-sm transition ${
+                completedLectures.includes(activeLecture?.id)
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                  : 'bg-blue-600 hover:bg-blue-500 text-white'
+              }`}
+            >
+              <CheckCircle className="w-4 h-4" />
+              <span>{completedLectures.includes(activeLecture?.id) ? 'Completed (Claim Cert)' : 'Mark Finished'}</span>
+            </button>
           </div>
 
           {/* Player Tabs */}
@@ -452,7 +407,7 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
                     type="text"
                     value={noteContent}
                     onChange={(e) => setNoteContent(e.target.value)}
-                    placeholder={`Take a note at ${formatSeconds(currentTime)}...`}
+                    placeholder="Take a timestamped lecture note..."
                     className="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                   <button
@@ -503,146 +458,139 @@ export const CoursePlayer: React.FC<CoursePlayerProps> = ({ courseId, onBack }) 
           </div>
         </div>
 
-        {/* Right Sidebar: AI Tutor Drawer */}
+        {/* Right Sidebar: AI Tutor Drawer & Syllabus Switcher */}
         <div className="w-full lg:w-96 bg-slate-950 border-t lg:border-t-0 lg:border-l border-slate-800 flex flex-col h-[550px] lg:h-auto">
-          {isAiOpen ? (
-            <div className="flex-1 flex flex-col h-full">
-              {/* AI Drawer Header */}
-              <div className="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
-                <div className="flex items-center space-x-2">
-                  <Bot className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
-                      Course AI Tutor
-                      <span className="px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded text-[10px]">RAG</span>
-                    </h3>
-                    <p className="text-[10px] text-slate-400">Grounded in lecture material</p>
-                  </div>
-                </div>
-
-                {/* Difficulty Depth Switcher */}
-                <select
-                  value={aiMode}
-                  onChange={(e) => setAiMode(e.target.value as any)}
-                  className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] rounded-lg px-2 py-1 focus:outline-none"
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-
-              {/* Chat Messages Log */}
-              <div className="flex-1 p-3 overflow-y-auto space-y-3">
-                {chatMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
-                        msg.sender === 'user'
-                          ? 'bg-blue-600 text-white rounded-br-none'
-                          : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'
-                      }`}
-                    >
-                      <p className="whitespace-pre-line">{msg.content}</p>
-
-                      {/* Source Citation Pills */}
-                      {msg.sources && msg.sources.length > 0 && (
-                        <div className="mt-2.5 pt-2 border-t border-slate-800/80">
-                          <span className="text-[10px] font-semibold text-amber-400 block mb-1">
-                            Grounding Citation:
-                          </span>
-                          {msg.sources.map((s: any, idx: number) => (
-                            <span
-                              key={idx}
-                              className="inline-block text-[10px] bg-slate-800 text-blue-300 px-2 py-0.5 rounded border border-slate-700 mr-1"
-                            >
-                              📍 {s.lectureTitle} @ {formatSeconds(s.timestampSeconds)}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {isAiTyping && (
-                  <div className="text-xs text-slate-400 italic flex items-center gap-1.5 p-2">
-                    <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-400" />
-                    AI Tutor is retrieving lecture context...
-                  </div>
-                )}
-              </div>
-
-              {/* Quick Prompt Pills */}
-              <div className="px-3 py-1.5 border-t border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px]">
+          {/* Lecture Switcher Header */}
+          <div className="p-3 bg-slate-900 border-b border-slate-800">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Switch Lecture:</span>
+            <div className="flex gap-2">
+              {course.modules?.[0]?.lectures?.map((lec: any, idx: number) => (
                 <button
-                  onClick={() => handleSendMessage('Why does quicksort degrade to O(n^2)?')}
-                  className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
+                  key={lec.id}
+                  onClick={() => handleLectureChange(lec)}
+                  className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${
+                    activeLecture?.id === lec.id
+                      ? 'bg-blue-600 text-white shadow'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  }`}
                 >
-                  ⚡ Quicksort O(n²)
+                  Lecture 0{idx + 1}
                 </button>
-                <button
-                  onClick={() => handleSendMessage('Explain BST In-Order Traversal')}
-                  className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
-                >
-                  🌲 BST Traversal
-                </button>
-              </div>
-
-              {/* Chat Input Box */}
-              <div className="p-3 border-t border-slate-800 bg-slate-900/60">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }}
-                  className="flex gap-2"
-                >
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder="Ask about this lecture..."
-                    className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <button
-                    type="submit"
-                    className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow transition"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
-              </div>
+              ))}
             </div>
-          ) : (
-            /* Syllabus Accordion */
-            <div className="p-4 overflow-y-auto">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Course Syllabus</h3>
-              {course.modules?.map((m: any) => (
-                <div key={m.id} className="mb-4">
-                  <h4 className="text-xs font-semibold text-slate-300 mb-2">{m.title}</h4>
-                  <div className="space-y-1">
-                    {m.lectures?.map((lec: any) => (
-                      <button
-                        key={lec.id}
-                        onClick={() => handleLectureChange(lec)}
-                        className={`w-full text-left p-2.5 rounded-xl text-xs flex items-center justify-between transition ${
-                          activeLecture?.id === lec.id
-                            ? 'bg-blue-600 text-white font-semibold'
-                            : 'hover:bg-slate-900 text-slate-400'
-                        }`}
-                      >
-                        <span className="line-clamp-1">{lec.title}</span>
-                        {completedLectures.includes(lec.id) && <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />}
-                      </button>
-                    ))}
+          </div>
+
+          {/* AI Tutor Chat Drawer */}
+          <div className="flex-1 flex flex-col h-full">
+            {/* AI Drawer Header */}
+            <div className="p-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+              <div className="flex items-center space-x-2">
+                <Bot className="w-5 h-5 text-blue-400" />
+                <div>
+                  <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                    Course AI Tutor
+                    <span className="px-1.5 py-0.2 bg-blue-500/20 text-blue-300 rounded text-[10px]">RAG</span>
+                  </h3>
+                  <p className="text-[10px] text-slate-400">Grounded in lecture material</p>
+                </div>
+              </div>
+
+              {/* Difficulty Depth Switcher */}
+              <select
+                value={aiMode}
+                onChange={(e) => setAiMode(e.target.value as any)}
+                className="bg-slate-800 border border-slate-700 text-slate-200 text-[11px] rounded-lg px-2 py-1 focus:outline-none"
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
+
+            {/* Chat Messages Log */}
+            <div className="flex-1 p-3 overflow-y-auto space-y-3">
+              {chatMessages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
+                      msg.sender === 'user'
+                        ? 'bg-blue-600 text-white rounded-br-none'
+                        : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'
+                    }`}
+                  >
+                    <p className="whitespace-pre-line">{msg.content}</p>
+
+                    {/* Source Citation Pills */}
+                    {msg.sources && msg.sources.length > 0 && (
+                      <div className="mt-2.5 pt-2 border-t border-slate-800/80">
+                        <span className="text-[10px] font-semibold text-amber-400 block mb-1">
+                          Grounding Citation:
+                        </span>
+                        {msg.sources.map((s: any, idx: number) => (
+                          <span
+                            key={idx}
+                            className="inline-block text-[10px] bg-slate-800 text-blue-300 px-2 py-0.5 rounded border border-slate-700 mr-1"
+                          >
+                            📍 {s.lectureTitle} @ {formatSeconds(s.timestampSeconds)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
+              {isAiTyping && (
+                <div className="text-xs text-slate-400 italic flex items-center gap-1.5 p-2">
+                  <Sparkles className="w-3.5 h-3.5 animate-spin text-blue-400" />
+                  AI Tutor is retrieving lecture context...
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Quick Prompt Pills */}
+            <div className="px-3 py-1.5 border-t border-slate-800/80 flex gap-1.5 overflow-x-auto text-[11px]">
+              <button
+                onClick={() => handleSendMessage('Why does quicksort degrade to O(n^2)?')}
+                className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
+              >
+                ⚡ Quicksort O(n²)
+              </button>
+              <button
+                onClick={() => handleSendMessage('Explain BST In-Order Traversal')}
+                className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded border border-slate-800 whitespace-nowrap"
+              >
+                🌲 BST Traversal
+              </button>
+            </div>
+
+            {/* Chat Input Box */}
+            <div className="p-3 border-t border-slate-800 bg-slate-900/60">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+                className="flex gap-2"
+              >
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Ask about this lecture..."
+                  className="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <button
+                  type="submit"
+                  className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow transition"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 
