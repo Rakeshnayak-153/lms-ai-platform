@@ -1,74 +1,76 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Navbar } from './components/common/Navbar';
+import { CourseCatalog } from './pages/course-catalog/CourseCatalog';
+import { CoursePlayer } from './pages/course-player/CoursePlayer';
+import { StudentDashboard } from './pages/dashboard/StudentDashboard';
+import { InstructorStudio } from './pages/instructor/InstructorStudio';
+import { AdminPanel } from './pages/admin-panel/AdminPanel';
+import { AuthModal } from './pages/auth/AuthModal';
+import { useAuthStore } from './store/useAuthStore';
 
 export default function App() {
+  const [currentTab, setCurrentTab] = useState<'catalog' | 'dashboard' | 'instructor' | 'admin'>('catalog');
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { activeRole } = useAuthStore();
+
+  const handleSelectCourse = (courseId: string) => {
+    setSelectedCourseId(courseId);
+  };
+
+  const handleBackToCatalog = () => {
+    setSelectedCourseId(null);
+  };
+
+  // If a course is selected, render Course Player
+  if (selectedCourseId) {
+    return (
+      <CoursePlayer
+        courseId={selectedCourseId}
+        onBack={handleBackToCatalog}
+      />
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
-      <header className="bg-white border-b border-slate-200 px-6 py-4 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Vertexon LMS-AI
-            </span>
-            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full font-medium">
-              v1.0 Scaffold
-            </span>
-          </div>
-          <nav className="flex space-x-6 text-sm font-medium text-slate-600">
-            <a href="#student" className="hover:text-blue-600">Student Portal</a>
-            <a href="#instructor" className="hover:text-blue-600">Instructor Studio</a>
-            <a href="#admin" className="hover:text-blue-600">Admin Console</a>
-            <a href="#ai-tutor" className="hover:text-blue-600">AI Tutor</a>
-          </nav>
-        </div>
-      </header>
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+      <Navbar
+        currentTab={currentTab}
+        setCurrentTab={(tab) => setCurrentTab(tab as any)}
+        onOpenAuth={() => setShowAuthModal(true)}
+      />
 
-      <main className="max-w-7xl mx-auto px-6 py-12 flex-grow w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-          <h1 className="text-3xl font-extrabold text-slate-900 mb-4">
-            AI-Augmented Learning Management System
-          </h1>
-          <p className="text-slate-600 text-lg mb-8 max-w-3xl">
-            Welcome to the LMS-AI project workspace. Grounded RAG AI tutoring, personalized study plans,
-            course authoring, and auto-generated quizzes are architected across three core modules.
-          </p>
+      <main className="flex-grow">
+        {currentTab === 'catalog' && (
+          <CourseCatalog onSelectCourse={handleSelectCourse} />
+        )}
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border border-slate-200 rounded-xl p-6 bg-slate-50 hover:border-blue-300 transition">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">🎓 Student Module</h2>
-              <p className="text-sm text-slate-600 mb-4">
-                Course catalog, video player with resume, timestamped notes, assignment upload, and certificates.
-              </p>
-              <span className="inline-block text-xs font-semibold px-2 py-1 bg-green-100 text-green-700 rounded">
-                P0 Ready
-              </span>
-            </div>
+        {currentTab === 'dashboard' && (
+          <StudentDashboard
+            onSelectCourse={handleSelectCourse}
+            onExploreCatalog={() => setCurrentTab('catalog')}
+          />
+        )}
 
-            <div className="border border-slate-200 rounded-xl p-6 bg-slate-50 hover:border-blue-300 transition">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">🤖 AI Tutor & RAG</h2>
-              <p className="text-sm text-slate-600 mb-4">
-                Course-grounded doubt resolution, transcript summarization, flashcards, and adaptive explanations.
-              </p>
-              <span className="inline-block text-xs font-semibold px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                pgvector + LLM
-              </span>
-            </div>
+        {currentTab === 'instructor' && (
+          <InstructorStudio />
+        )}
 
-            <div className="border border-slate-200 rounded-xl p-6 bg-slate-50 hover:border-blue-300 transition">
-              <h2 className="text-xl font-bold text-slate-900 mb-2">📊 Instructor & Admin</h2>
-              <p className="text-sm text-slate-600 mb-4">
-                Course creation, AI quiz approval, lecture drop-off analytics, and governance moderation.
-              </p>
-              <span className="inline-block text-xs font-semibold px-2 py-1 bg-amber-100 text-amber-700 rounded">
-                RBAC Governed
-              </span>
-            </div>
-          </div>
-        </div>
+        {currentTab === 'admin' && (
+          <AdminPanel />
+        )}
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-6 text-center text-sm text-slate-500">
-        Vertexon Learning Technologies Pvt. Ltd. &copy; 2026. All rights reserved.
+      <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>Vertexon Learning Technologies Pvt. Ltd. &copy; 2026. All rights reserved.</span>
+          <span className="text-[11px] text-blue-600 font-medium">LMS-AI Production Build v1.0 • RAG Embedded</span>
+        </div>
       </footer>
+
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
     </div>
   );
 }
